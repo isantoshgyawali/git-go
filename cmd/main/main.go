@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+    defer fmt.Print("\n")
     if len(os.Args) < 2 {
         fmt.Fprintf(os.Stderr, "usage: mygit <command> [<args>...]\n")
         os.Exit(1)
@@ -51,6 +52,23 @@ func main() {
             fmt.Print(objectSize)
         } else {
             fmt.Fprintf(os.Stderr, "Invalid flag for cat-file\nflags:\n\t-p or --pretty: Prints the contents of the object\n\t-s or --size: Displays the size of the object in bytes\n\t-t or --type: Displays the type of the object\n")
+        }
+
+    case "hash-object":
+        if len(os.Args) <=3 {
+            fmt.Fprintf(os.Stderr, "usage: mygit hash-object -w <content>\n")
+            os.Exit(1)
+        }
+
+        flag := os.Args[2]
+        fileName := os.Args[3]
+        objectHash, err := args.HashObject(fileName, "blob")
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Error Occured - %s\n", err)
+        }
+
+        if (flag == "-w") {
+            fmt.Println(objectHash)
         }
 
     default:

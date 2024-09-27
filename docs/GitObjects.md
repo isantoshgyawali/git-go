@@ -8,12 +8,12 @@ Git stores everything—commits, files, trees, and tags—as objects.and
 each object is represented by a unique SHA-1 hash (now SHA-256 in more recent versions) 
 and stored within the .git/objects directory.
  
-> ***"Unlike regular filesystems, where the name of a file is arbitrary and unrelated to that
+> *"Unlike regular filesystems, where the name of a file is arbitrary and unrelated to that
 file’s contents, the names of files as stored by Git are mathematically derived from 
 their contents. This has a very important implication: if a single byte of, say, a text 
 file, changes, its internal name will change, too. To put it simply: you don’t modify a
 file in git, you create a new file in a different location."<br>
--- refrence : [ https://wyag.thb.lt/#objects ]***
+-- refrence : [ https://wyag.thb.lt/#objects ]*
 
 For context:<br>
 If the SHA-1 hash of object is abcdef1234567890abcdef1234567890abcdef12, the file path will be:

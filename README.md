@@ -1,4 +1,4 @@
-## Learnings in a nutshell
+## Learnings in a Nutshell
 
 > 💡 **Tip**: Read in linear order as that is the way I wrote it<br>
 
