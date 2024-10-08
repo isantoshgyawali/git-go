@@ -24,25 +24,13 @@ efficiently over a network.
 
 -- Some Plumbing commands that are introduced in this codebase are described here:
 
-`git cat-file`<br>
-- allows you to inspect Git objects, view their contents, type, and size
+`git cat-file` ➔ [[ read more ]](./PlumbingForBlob.md)<br>
 
-***options:***<br>
--t or --type: Displays the type of the object. <br>
--s or --size: Displays the size of the object in bytes. <br>
--p or --pretty: Pretty prints the contents of the object. <br>
+`git hash-object` ➔ [[ read more ]](./PlumbingForBlob.md)<br>
 
-```go
-$ git cat-file -p b6fc092b8c43d64c9c2b310d3c2f2f3ff41b9c3a
-```
 ---
-`git hash-object`<br>
-- reads the inputs from file or standard input (--stdin),
-- computes SHA-1 key (hash) of contents provided,
-- returns unique key, that represents the content
-- optionally, writes the object into your git object database ( -w option ) 
 
--t \<type> : specifies the type of object (blob, tree, commit, tags)
-```go
-$ git hash-object -t blob README.md -w
-```
+`git ls-tree` ➔ [[ read more ]](./PlumbingForTree.md)<br>
+
+`git write-tree` ➔ [[ read more ]](./PlumbingForTree.md)<br>
+

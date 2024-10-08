@@ -29,7 +29,7 @@ func main() {
             fmt.Fprintf(os.Stderr, "Error writing file: %s\n", err)
         }
 
-        fmt.Println("Initialized git directory")
+        fmt.Printf("Initialized git directory")
 
     case "cat-file":
         if len(os.Args) <=3 {
@@ -44,31 +44,101 @@ func main() {
             fmt.Fprintf(os.Stderr, "Error: %s\n", err)
         }
 
-        if (flag == "-t" || flag == "--type") {
+        switch flag {
+        case "-t", "--type":
             fmt.Print(objectType)
-        } else if (flag == "-p" || flag == "--pretty") {
-            fmt.Print(objectContent)
-        } else if (flag == "-s" || flag == "--size") {
+        case "-s", "--size":
             fmt.Print(objectSize)
-        } else {
+        case "-p", "--pretty":
+            fmt.Print(objectContent)
+        default: 
             fmt.Fprintf(os.Stderr, "Invalid flag for cat-file\nflags:\n\t-p or --pretty: Prints the contents of the object\n\t-s or --size: Displays the size of the object in bytes\n\t-t or --type: Displays the type of the object\n")
         }
 
     case "hash-object":
-        if len(os.Args) <=3 {
-            fmt.Fprintf(os.Stderr, "usage: mygit hash-object -w <content>\n")
+        if len(os.Args) < 3 {
+            fmt.Fprintf(os.Stderr, "usage: mygit hash-object <content>\n")
             os.Exit(1)
         }
 
-        flag := os.Args[2]
-        fileName := os.Args[3]
-        objectHash, err := args.HashObject(fileName, "blob")
+        var fileName, flag string
+        var writeToDisk bool
+
+        if len(os.Args) == 3 {
+            fileName = os.Args[2]
+            flag = ""
+        } else {
+            flag = os.Args[2]
+            fileName = os.Args[3]
+        }
+
+        switch flag {
+        case "-w":
+            writeToDisk = true
+        case "":
+            writeToDisk = false
+        default:
+            fmt.Fprintf(os.Stderr, "Invalid flag for hash-object\n"+
+                "Supported flags:\n"+
+                "\t-w:\twrite the object into the object database\n")
+            os.Exit(1)
+            
+        }
+
+        objectHash, err := args.HashObject(fileName, writeToDisk)
         if err != nil {
             fmt.Fprintf(os.Stderr, "Error Occured - %s\n", err)
         }
+        fmt.Printf(objectHash)
 
-        if (flag == "-w") {
-            fmt.Println(objectHash)
+    case "ls-tree":
+        if len(os.Args) < 3 {
+            fmt.Fprintf(os.Stderr, "usage: mygit ls-tree <tree-sha>\n")
+            os.Exit(1)
+        }
+
+        var treeHash, flag string
+        if len(os.Args) == 3 {
+            treeHash = os.Args[2]
+        } else {
+            flag = os.Args[2]
+            treeHash = os.Args[3]
+        }
+
+        lsTree, err := args.LsTree(treeHash)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Error Occured - %s\n", err)           
+            os.Exit(1)
+        }
+
+        fmt.Println("hello:", lsTree)
+
+        switch flag {
+        case "--name-only":
+            for _, fileName := range lsTree{
+                fmt.Printf("%s\n", fileName.ObjectName)
+            }
+
+        case "--object-only":
+            for _, object := range lsTree{
+                fmt.Printf("%s\n", object.ObjectId)
+            }
+
+        case "":
+            for _, object := range lsTree{
+                fmt.Printf("%v %v %v\t%v\n\000", 
+                        object.ObjectPermission,
+                        object.ObjectName,
+                        object.ObjectId,
+                        object.ObjectName)
+            }
+
+        default:
+            fmt.Fprintf(os.Stderr, "Invalid flag for ls-tree\n"+
+                "Supported flags:\n"+
+                "\t--name-only:\tReturns only filenames\n"+
+                "\t--object-only:\tReturns only objects")
+            os.Exit(1)
         }
 
     default:

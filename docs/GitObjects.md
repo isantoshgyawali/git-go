@@ -40,6 +40,20 @@ blob 11\0hello world
 ```
 
 #### `Tree Objects`
+- Tree objects represent directories, and they reference other trees and blobs
+- Like other Git objects, a tree object is immutable. Once created, its contents do not change.
+- Each entry has:
+    - File mode: Indicates the type and permissions (e.g., 100644 for a file, 040000 for a subdirectory).
+    - SHA-1 hash (20 bytes): References a blob (file) or another tree (subdirectory).
+    - File name or directory name.
+
+>The root tree represents the entire repository at a specific point, and can have nested trees for subdirectories.
+A commit object references a root tree object that represents the state of the repository at the time of the commit.
+
+```golang
+100644 filename\0<20-byte hash>
+```
+
 #### `Commit Objects`
 #### `Tag Objects`
 
