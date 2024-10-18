@@ -1,52 +1,33 @@
 package args
 
 import (
-	"bytes"
-	"fmt"
+	"compress/zlib"
+	"os"
+	"path/filepath"
 )
 
 type LsTreeType struct {
-	ObjectId         string
-	ObjectName       string
-	ObjectType       string
-	ObjectPermission int
+    ObjectPermission string
+    ObjectType       string
+    ObjectId         string
+    ObjectName       string
 }
 
-func LsTree(treeHash string) ([]LsTreeType, error) {
+func readObject(objectId string) ([]byte, error){
+    objectpath := filepath.Join(".git","objects", objectId[:2], objectId[2:])
+    file, err := os.Open(objectpath)
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
 
-    objectType, content, _, err := CatFile(treeHash)
+    zlibReader, err := zlib.NewReader(file)
     if err != nil {
         return nil, err
     }
 
-    // checking if the object is tree or not
-    if objectType != "tree" {
-        return nil, fmt.Errorf("object %s is not a tree", treeHash)
-    }
+    return 
+}
 
-
-    var lsTreeEntries []LsTreeType
-    contentBytes := []byte(content)
-
-    for len(contentBytes) > 0 {
-        var entry LsTreeType
-        spaceIndex := bytes.IndexByte(contentBytes, ' ')
-        if spaceIndex == -1 {
-            break
-        }
-
-        mode := string(contentBytes[:spaceIndex])
-        fmt.Printf(mode)
-        contentBytes := contentBytes[spaceIndex+1:]
-
-        nullIndex := bytes.IndexByte(contentBytes, 0)
-        if nullIndex == -1 {
-            break
-        }
-
-        lsTreeEntries = append(lsTreeEntries, entry)
-    }
-
-
-    return lsTreeEntries, nil
+func LsTree(treeHash string) ([]LsTreeType, error) {
 }

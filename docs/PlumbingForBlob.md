@@ -9,7 +9,10 @@
 -p or --pretty: Pretty prints the contents of the object. <br>
 
 ```golang
-$ git cat-file -p b6fc092b8c43d64c9c2b310d3c2f2f3ff41b9c3a
+~/projects/test/git_test
+$ ../../git-go/main cat-file -p 3b18e512dba79e4c8300dd08aeb37f8e728b8dadhello world
+hello world!
+
 ```
 ---
 

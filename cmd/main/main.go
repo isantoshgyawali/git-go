@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/u/gitclone/args"
+	"github.com/isantoshgyawali/gitgo/args"
 )
 
 func main() {
     defer fmt.Print("\n")
     if len(os.Args) < 2 {
-        fmt.Fprintf(os.Stderr, "usage: mygit <command> [<args>...]\n")
+        fmt.Fprintf(os.Stderr, "usage: gitgo <command> [<args>...]\n")
         os.Exit(1)
     }
 
@@ -105,33 +105,32 @@ func main() {
             treeHash = os.Args[3]
         }
 
-        lsTree, err := args.LsTree(treeHash)
+        treeEntries, err := args.LsTree(treeHash)
         if err != nil {
             fmt.Fprintf(os.Stderr, "Error Occured - %s\n", err)           
             os.Exit(1)
         }
 
-        fmt.Println("hello:", lsTree)
-
         switch flag {
         case "--name-only":
-            for _, fileName := range lsTree{
+            for _, fileName := range treeEntries {
                 fmt.Printf("%s\n", fileName.ObjectName)
             }
 
         case "--object-only":
-            for _, object := range lsTree{
+            for _, object := range treeEntries {
                 fmt.Printf("%s\n", object.ObjectId)
             }
 
         case "":
-            for _, object := range lsTree{
-                fmt.Printf("%v %v %v\t%v\n\000", 
-                        object.ObjectPermission,
-                        object.ObjectName,
-                        object.ObjectId,
-                        object.ObjectName)
-            }
+            // for _, object := range treeEntries {
+            //     fmt.Printf("%v %v %v\t%v\n\000", 
+            //             object.ObjectPermission,
+            //             object.ObjectName,
+            //             object.ObjectId,
+            //             object.ObjectName)
+            // }
+            fmt.Println("empty flag")
 
         default:
             fmt.Fprintf(os.Stderr, "Invalid flag for ls-tree\n"+

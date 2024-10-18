@@ -1,5 +1,3 @@
-module github.com/u/gitclone
+module github.com/isantoshgyawali/gitgo
 
 go 1.22.5
-
-require golang.org/x/tools v0.25.0
