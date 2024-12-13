@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/isantoshgyawali/gitgo/args"
+	"github.com/isantoshgyawali/git-go/args"
 )
 
 func main() {
-    defer fmt.Print("\n")
+    // defer fmt.Print("\n")
     if len(os.Args) < 2 {
         fmt.Fprintf(os.Stderr, "usage: gitgo <command> [<args>...]\n")
         os.Exit(1)
@@ -33,24 +33,30 @@ func main() {
 
     case "cat-file":
         if len(os.Args) <=3 {
-            fmt.Fprintf(os.Stderr, "usage: mygit cat-file -p <object-hash>\n")
+            fmt.Fprintf(os.Stderr, "usage: mygit cat-file -p <object-hash>")
             os.Exit(1)
         }
 
         flag := os.Args[2]
         objectHash := os.Args[3]
-        objectType, objectContent, objectSize, err := args.CatFile(objectHash)
+        object, err := args.CatFile(objectHash)
         if err != nil {
             fmt.Fprintf(os.Stderr, "Error: %s\n", err)
         }
 
         switch flag {
         case "-t", "--type":
-            fmt.Print(objectType)
+            fmt.Print(object.Type)
         case "-s", "--size":
-            fmt.Print(objectSize)
+            fmt.Print(object.Size)
         case "-p", "--pretty":
-            fmt.Print(objectContent)
+            if(object.Type == "tree"){
+                for _, entry := range object.TreeEntries {
+                    fmt.Printf("%s %s %s %s\n", entry.Mode, entry.Type, entry.Hash, entry.Name)
+                }
+            } else {
+                fmt.Print(object.Content)
+            }
         default: 
             fmt.Fprintf(os.Stderr, "Invalid flag for cat-file\nflags:\n\t-p or --pretty: Prints the contents of the object\n\t-s or --size: Displays the size of the object in bytes\n\t-t or --type: Displays the type of the object\n")
         }
@@ -114,23 +120,23 @@ func main() {
         switch flag {
         case "--name-only":
             for _, fileName := range treeEntries {
-                fmt.Printf("%s\n", fileName.ObjectName)
+                fmt.Printf("%s\n", fileName.Name)
             }
 
         case "--object-only":
             for _, object := range treeEntries {
-                fmt.Printf("%s\n", object.ObjectId)
+                fmt.Printf("%s\n", object.Hash)
             }
 
         case "":
-            // for _, object := range treeEntries {
-            //     fmt.Printf("%v %v %v\t%v\n\000", 
-            //             object.ObjectPermission,
-            //             object.ObjectName,
-            //             object.ObjectId,
-            //             object.ObjectName)
-            // }
-            fmt.Println("empty flag")
+            for _, entry := range treeEntries {
+                fmt.Printf("%v %v %v %v\n", 
+                    entry.Mode,
+                    entry.Type,
+                    entry.Hash,
+                    entry.Name,
+                )
+            }
 
         default:
             fmt.Fprintf(os.Stderr, "Invalid flag for ls-tree\n"+

@@ -1,33 +1,36 @@
 package args
 
 import (
-	"compress/zlib"
-	"os"
-	"path/filepath"
+	"bytes"
+	"fmt"
+
+	"github.com/isantoshgyawali/git-go/utils"
 )
 
-type LsTreeType struct {
-    ObjectPermission string
-    ObjectType       string
-    ObjectId         string
-    ObjectName       string
-}
-
-func readObject(objectId string) ([]byte, error){
-    objectpath := filepath.Join(".git","objects", objectId[:2], objectId[2:])
-    file, err := os.Open(objectpath)
+func LsTree(treeHash string) ([]*utils.TreeEntry, error) {
+    // take hash
+    // forward hash to ParseTree
+    // parse tree returns slices of TreeEntries 
+    // return treeentries
+    path := utils.GetObjectPath(treeHash)
+    content, err := utils.DecompressObject(path)
     if err != nil {
-        return nil, err
-    }
-    defer file.Close()
-
-    zlibReader, err := zlib.NewReader(file)
-    if err != nil {
-        return nil, err
+        return nil, err 
     }
 
-    return 
+    nullByteIndex := bytes.IndexByte(content, 0)
+    if nullByteIndex == -1 {
+        return nil, fmt.Errorf("Invalid Git Object Format")
+    }
+    objectContent := content[nullByteIndex+1:]
+
+    treeEntries, err := utils.ParseTree([]byte(objectContent))
+    if err != nil {
+        return nil, err 
+    }
+
+    return treeEntries, nil
 }
 
-func LsTree(treeHash string) ([]LsTreeType, error) {
-}
+
+
