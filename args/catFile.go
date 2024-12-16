@@ -8,7 +8,11 @@ import (
 )
 
 func CatFile(objectHash string) (*utils.Object, error) {
-        path := utils.GetObjectPath(objectHash)
+        path, err := utils.GetObjectPath(objectHash)
+        if err != nil {
+            return nil, err 
+        }
+
         content, err := utils.DecompressObject(path)
         if err != nil {
             return nil, err 

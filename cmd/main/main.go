@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"os"
+    "fmt"
+    "os"
 
-	"github.com/isantoshgyawali/git-go/args"
+    "github.com/isantoshgyawali/git-go/args"
 )
 
 func main() {
-    // defer fmt.Print("\n")
+    defer fmt.Print("\n")
     if len(os.Args) < 2 {
         fmt.Fprintf(os.Stderr, "usage: gitgo <command> [<args>...]\n")
         os.Exit(1)
@@ -88,7 +88,7 @@ func main() {
                 "Supported flags:\n"+
                 "\t-w:\twrite the object into the object database\n")
             os.Exit(1)
-            
+
         }
 
         objectHash, err := args.HashObject(fileName, writeToDisk)
@@ -135,7 +135,7 @@ func main() {
                     entry.Type,
                     entry.Hash,
                     entry.Name,
-                )
+                    )
             }
 
         default:
@@ -146,6 +146,10 @@ func main() {
             os.Exit(1)
         }
 
+    case "write-tree":
+        args.WriteTree()
+            
+        
     default:
         fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
         os.Exit(1)

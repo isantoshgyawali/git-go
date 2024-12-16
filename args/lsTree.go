@@ -12,7 +12,10 @@ func LsTree(treeHash string) ([]*utils.TreeEntry, error) {
     // forward hash to ParseTree
     // parse tree returns slices of TreeEntries 
     // return treeentries
-    path := utils.GetObjectPath(treeHash)
+    path, err := utils.GetObjectPath(treeHash)
+    if err != nil {
+        return nil, err 
+    }
     content, err := utils.DecompressObject(path)
     if err != nil {
         return nil, err 

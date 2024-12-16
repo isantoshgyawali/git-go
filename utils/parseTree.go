@@ -50,16 +50,3 @@ func ParseTree(content []byte) ([]*TreeEntry, error) {
 
     return entries, nil
 }
-
-func ModeToType(mode string) string {
-    switch mode {
-    case "100644", "100755", "120000":
-        return "blob"
-    case "040000":
-        return "tree"
-    case "160000":
-        return "commit"
-    default:
-        return "unknown"
-    }
-}

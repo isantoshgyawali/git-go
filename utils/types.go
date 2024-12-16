@@ -13,4 +13,3 @@ type TreeEntry struct {
     Name string
     Hash string
 }
-

@@ -98,3 +98,50 @@ ea7212c1feb7dd6ab7584611b08c4adc9eeb4714
 f9d6d443ec1e90e0b2b6d9503d1ddff1b478cb10
 ed02809a7da815888decce805e095224931c24ee
 ```
+
+`git write-tree`
+---
+
+The "git write-tree" command creates a tree object from the current index of "staging area". 
+The staging area is a place where changes go when you run git add.
+And, the name of the new tree object is printed to the standard output
+
+```bash 
+$ git write-tree
+
+-- Example -- 
+# create some files and subdir
+~/projects/git-go (master)
+$ echo "Content of file1" > file1.txt && echo "Content of file2" > file2.txt
+
+~/projects/git-go (master)
+$ mkdir subdir && echo "Content of file3 in subdir" > subdir/file3.txt
+
+# Add the files to staging area
+~/projects/git-go (master)
+$ git add file1.txt file2.txt subdir/file3.txt
+
+# write-tree
+~/projects/git-go (master)
+$ git write-tree
+3a0c8a1cbbd0b4f4344e947db9e6b11c9075f445
+
+```
+
+>Note: <br> 
+This git-go implementation doesn't include the concept of the staging 
+area at least for now - here, we assume every file is in the staging area  
+
+```bash
+# To inspect and test the subtree we generated we could try `git cat-file` or `git ls-tree`
+$ git cat-file -p 3a0c8a1cbbd0b4f4344e947db9e6b11c9075f445
+100644 blob a7815fd88b2e91bfa8a9b6619e490cd0cf147cc0    file1.txt
+100644 blob b47b13c86524a5501118256fa4387c9e52d7bdc9    file2.txt
+040000 tree e1e43b13c1d0eb8e4f69b302be6e1dc62492f97d    subdir
+-- or -- 
+$ git ls-tree 3a0c8a1cbbd0b4f4344e947db9e6b11c9075f445
+100644 blob a7815fd88b2e91bfa8a9b6619e490cd0cf147cc0    file1.txt
+100644 blob b47b13c86524a5501118256fa4387c9e52d7bdc9    file2.txt
+040000 tree e1e43b13c1d0eb8e4f69b302be6e1dc62492f97d    subdir
+
+```
