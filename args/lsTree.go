@@ -7,7 +7,7 @@ import (
 	"github.com/isantoshgyawali/git-go/utils"
 )
 
-func LsTree(treeHash string) ([]*utils.TreeEntry, error) {
+func LsTree(treeHash string) ([]*utils.TreeNode, error) {
     // take hash
     // forward hash to ParseTree
     // parse tree returns slices of TreeEntries 
@@ -27,12 +27,12 @@ func LsTree(treeHash string) ([]*utils.TreeEntry, error) {
     }
     objectContent := content[nullByteIndex+1:]
 
-    treeEntries, err := utils.ParseTree([]byte(objectContent))
+    tree, err := utils.ParseTree([]byte(objectContent))
     if err != nil {
         return nil, err 
     }
 
-    return treeEntries, nil
+    return tree, nil
 }
 
 

@@ -4,12 +4,15 @@ type Object struct {
     Type string
     Content interface{}
     Size int64
-    TreeEntries []*TreeEntry
 }
 
-type TreeEntry struct {
+type TreeNode struct {
     Mode string
     Type string
     Name string
     Hash string
+    Path string
+    IsDir bool
+    Children []*TreeNode
 }
+

@@ -1,13 +1,12 @@
 package utils
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 )
 
-func FileDetails(file string) (*TreeEntry, error) {
+func FileDetails(file string) (*TreeNode, error) {
     info, err := os.Stat(file)
     if err != nil {
         return nil, fmt.Errorf("File not found: %v", err) 
@@ -16,17 +15,19 @@ func FileDetails(file string) (*TreeEntry, error) {
     content, _ := os.ReadFile(file)
     mode := FileModeToGitMode(info.Mode())
     name := fmt.Sprintf("%s", info.Name())
-    buf := &bytes.Buffer{}
-    hash, err := CompressObject("blob", content, buf)
+    hash, err := CompressObject("blob", content, nil)
     if err != nil {
         return nil, err 
     }
     
-    return &TreeEntry{
+    return &TreeNode{
         Mode: mode, 
         Type: "blob",
         Name: name,
         Hash: hash,
+        Path: file,
+        IsDir: false,
+        Children: nil,
     }, nil 
 }
 

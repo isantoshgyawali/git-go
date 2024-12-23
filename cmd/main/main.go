@@ -1,10 +1,11 @@
 package main
 
 import (
-    "fmt"
-    "os"
+	"fmt"
+	"os"
 
-    "github.com/isantoshgyawali/git-go/args"
+	"github.com/isantoshgyawali/git-go/args"
+	"github.com/isantoshgyawali/git-go/utils"
 )
 
 func main() {
@@ -51,12 +52,17 @@ func main() {
             fmt.Print(object.Size)
         case "-p", "--pretty":
             if(object.Type == "tree"){
-                for _, entry := range object.TreeEntries {
-                    fmt.Printf("%s %s %s %s\n", entry.Mode, entry.Type, entry.Hash, entry.Name)
+                //checking if the Content is treeNode or blob object
+                if treeNodes, ok := object.Content.([]*utils.TreeNode); ok {
+                    for _, entry := range treeNodes {
+                        fmt.Printf("%s %s %s %s\n", entry.Mode, entry.Type, entry.Hash, entry.Name)
+                    }
+                } else {
+                    fmt.Fprintf(os.Stderr, "Invalid content type for for tree object")
+                    }
+                } else {
+                    fmt.Print(object.Content)
                 }
-            } else {
-                fmt.Print(object.Content)
-            }
         default: 
             fmt.Fprintf(os.Stderr, "Invalid flag for cat-file\nflags:\n\t-p or --pretty: Prints the contents of the object\n\t-s or --size: Displays the size of the object in bytes\n\t-t or --type: Displays the type of the object\n")
         }
@@ -147,8 +153,9 @@ func main() {
         }
 
     case "write-tree":
-        args.WriteTree()
-            
+        currentDir, _ := os.Getwd()
+        treeHash, _ := args.WriteTree(currentDir)
+        fmt.Println(treeHash)
         
     default:
         fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)

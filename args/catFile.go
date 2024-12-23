@@ -43,7 +43,7 @@ func CatFile(objectHash string) (*utils.Object, error) {
                 if err != nil {
                     return nil, err 
                 }
-                obj.TreeEntries = treeEntries
+                obj.Content = treeEntries
             default:
                 // here returning as it is for other type
                 // but could be updated for different cases

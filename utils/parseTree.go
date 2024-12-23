@@ -8,8 +8,8 @@ import (
 // Function parses the content and retrun entries if content is a tree object
 // format of the parsing content: 
 // <mode> <name>\0<hash (20 bytes)> <mode> <name>\0<hash (20 bytes)> ... ... .. 
-func ParseTree(content []byte) ([]*TreeEntry, error) {
-    var entries []*TreeEntry      
+func ParseTree(content []byte) ([]*TreeNode, error) {
+    var entries []*TreeNode      
     for len(content) > 0 {
         spaceIndex := bytes.IndexByte(content, ' ')
         if spaceIndex == -1 {
@@ -38,7 +38,7 @@ func ParseTree(content []byte) ([]*TreeEntry, error) {
             ParseTree([]byte(entryHash))
         }
 
-        entries = append(entries, &TreeEntry{
+        entries = append(entries, &TreeNode{
             Mode: entryMode,
             Type: entryType,
             Name: entryName,

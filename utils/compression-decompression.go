@@ -21,6 +21,10 @@ func GetObjectPath(objectHash string) (string, error) {
 }
 
 func CompressObject(objectType string, content []byte, buf *bytes.Buffer) (string, error) {
+     if buf == nil {
+        buf = &bytes.Buffer{}
+    }
+
     // header format: <type> <size>\0<content>
     header := fmt.Sprintf("%s %d\000", objectType, len(content))
     // null byte representation type
