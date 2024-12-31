@@ -6,8 +6,8 @@ import (
 )
 
 // Function parses the content and retrun entries if content is a tree object
-// format of the parsing content: 
-// <mode> <name>\0<hash (20 bytes)> <mode> <name>\0<hash (20 bytes)> ... ... .. 
+// format of the parsing content:
+// <mode> <name>\0<hash (20 bytes)> <mode> <name>\0<hash (20 bytes)> ... ... ..
 func ParseTree(content []byte) ([]*TreeNode, error) {
     var entries []*TreeNode      
     for len(content) > 0 {
@@ -34,7 +34,8 @@ func ParseTree(content []byte) ([]*TreeNode, error) {
             return nil, fmt.Errorf("Invalid tree object format: insufficient data for hash")
         } 
         entryHash := fmt.Sprintf("%x", content[:20])
-        if entryMode == "040000" {
+        if entryMode == "40000" {
+            entryMode = "040000"
             ParseTree([]byte(entryHash))
         }
 

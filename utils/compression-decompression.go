@@ -13,12 +13,47 @@ func GetObjectPath(objectHash string) (string, error) {
 	// For Context:
 	//  If the SHA-1 hash is abcdef1234567890abcdef1234567890abcdef12, the file path will be:
 	//  .git/objects/ab/cdef1234567890abcdef1234567890abcdef12
-        gitRoot, err := FindGitRoot()
+        gitDir, _, err := FindGitRoot()
         if err != nil {
             return "", err  
         }
-	return fmt.Sprintf("%s/objects/%v/%v", gitRoot, objectHash[:2], objectHash[2:]), nil
+
+	return fmt.Sprintf("%s/objects/%v/%v", gitDir, objectHash[:2], objectHash[2:]), nil
 }
+
+func HashIt(content []byte) []byte {
+    hasher := sha1.New()
+    hasher.Write(content)
+    shaOneHash := hasher.Sum(nil)
+    // or - we could just:
+    // shaOneHash := sha1.Sum(object)
+    //
+    // which is more like go idiomatic: simple, concise and easy to understand
+    // but first implementaion does streaming and maybe "maybe..." more optimized
+    // as entire file isn't being loaded into the memory
+    return shaOneHash
+}
+
+func compressData(data []byte, buf *bytes.Buffer) error {
+    if buf == nil {
+        buf = &bytes.Buffer{}
+    }
+
+    zlibWriter := zlib.NewWriter(buf)
+    // Writes the data to the zlib writer.
+    // Write method compresses the data and writes it to buf.
+    // initializing a bytes.Buffer, to temporarily hold the compressed data
+    // It returns the number of bytes written and an error, if any occurred.
+    if _, err := zlibWriter.Write(data); err != nil {
+        return  err
+    }
+
+    if err := zlibWriter.Close(); err != nil {
+        return err
+    }
+
+    return nil
+} 
 
 func CompressObject(objectType string, content []byte, buf *bytes.Buffer) (string, error) {
      if buf == nil {
@@ -37,33 +72,14 @@ func CompressObject(objectType string, content []byte, buf *bytes.Buffer) (strin
     object = append([]byte(header), content...)
 
     // Hash the uncompressed content with header: [ sha1 hashing ]
-    hasher := sha1.New()
-    hasher.Write(object)
-    shaOneHash := hasher.Sum(nil)
-    // or - we could just:
-    // shaOneHash := sha1.Sum(object)
-    //
-    // which is more like go idiomatic: simple, concise and easy to understand
-    // but first implementaion does streaming and maybe "maybe..." more optimized
-    // as entire file isn't being loaded into the memory
-
+    shaOneHash := HashIt(object)
     // hexadecimal representation for the HashObject
     // to store in the .git/objects
     objectHash := fmt.Sprintf("%x", shaOneHash)
 
     // -- zlib compression --
-    zlibWriter := zlib.NewWriter(buf)
-
-    // Writes the data to the zlib writer.
-    // Write method compresses the data and writes it to buf.
-    // initializing a bytes.Buffer, to temporarily hold the compressed data
-    // It returns the number of bytes written and an error, if any occurred.
-    if _, err := zlibWriter.Write(object); err != nil {
-        return "", err
-    }
-
-    if err := zlibWriter.Close(); err != nil {
-        return "", err
+    if err := compressData(object, buf); err != nil {
+        return "", fmt.Errorf("Error while zlib compression\n%v", err)
     }
 
     return objectHash, nil

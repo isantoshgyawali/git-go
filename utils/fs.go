@@ -31,31 +31,31 @@ func FileDetails(file string) (*TreeNode, error) {
     }, nil 
 }
 
-func FindGitRoot() (string, error) {
-    dir, err := os.Getwd() // returns Current Working directory
+func FindGitRoot() (gitDir string, rootPath string, err error) {
+    rootPath, err = os.Getwd() // returns Current Working directory
     if err != nil {
-        return "", err 
+        return "", "", err 
     }
 
     for {
-        gitPath := filepath.Join(dir, ".git")
-        if _, err := os.Stat(gitPath); err == nil {
-            return gitPath, nil // found the git root
+        gitDir = filepath.Join(rootPath, ".git")
+        if _, err := os.Stat(gitDir); err == nil {
+            return gitDir, rootPath, nil // found the git root - return the dir
         }
-        parentDir := filepath.Dir(dir)
-        if parentDir == dir {
+        parentDir := filepath.Dir(rootPath)
+        if parentDir == rootPath {
             break
         }
-        dir = parentDir
+        rootPath = parentDir
     }
-    return "", fmt.Errorf(".git directory not found.")
+    return "", "", fmt.Errorf(".git directory not found.")
 }
 
 func ModeToType(mode string) string {
     switch mode {
     case "100644", "100755", "120000":
         return "blob"
-    case "040000":
+    case "040000", "40000":
         return "tree"
     case "160000":
         return "commit"
