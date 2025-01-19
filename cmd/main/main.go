@@ -153,12 +153,13 @@ func main() {
         }
 
     case "write-tree":
-        gitDir, _, err := utils.FindGitRoot()
+        _, rootPath, err := utils.FindGitRoot()
         if err != nil {
-            fmt.Fprintf(os.Stderr, "Error finding git root. Have you initialized the git project?\n%v", err) 
+            fmt.Fprintf(os.Stderr, err.Error()) 
+            os.Exit(1)
         }
 
-        treeHash, err := args.WriteTree(gitDir)
+        treeHash, err := args.WriteTree(rootPath)
         if err != nil {
             fmt.Fprintf(os.Stderr, "Error writing tree.\n%v", err) 
         }

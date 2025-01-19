@@ -25,7 +25,7 @@ func HashObject(fileName string, writeToDisk bool) (string, error) {
         
         // Initialize it to avoid the nil pointer dereferencing
         buf := &bytes.Buffer{}
-        compressedObjectHash, err := utils.CompressObject("blob", content, buf)
+        compressedObjectHash, err := utils.CompressObject("blob", content)
         if err != nil {
             return "", err  
         }

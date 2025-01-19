@@ -15,7 +15,8 @@ func GetObjectPath(objectHash string) (string, error) {
 	//  .git/objects/ab/cdef1234567890abcdef1234567890abcdef12
         gitDir, _, err := FindGitRoot()
         if err != nil {
-            return "", err  
+            fmt.Fprintf(os.Stderr, err.Error())  
+            os.Exit(1)
         }
 
 	return fmt.Sprintf("%s/objects/%v/%v", gitDir, objectHash[:2], objectHash[2:]), nil
@@ -55,11 +56,8 @@ func compressData(data []byte, buf *bytes.Buffer) error {
     return nil
 } 
 
-func CompressObject(objectType string, content []byte, buf *bytes.Buffer) (string, error) {
-     if buf == nil {
-        buf = &bytes.Buffer{}
-    }
-
+func CompressObject(objectType string, content []byte) (string, error) {
+  buf := &bytes.Buffer{}
     // header format: <type> <size>\0<content>
     header := fmt.Sprintf("%s %d\000", objectType, len(content))
     // null byte representation type

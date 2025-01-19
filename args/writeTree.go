@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"sort"
 
 	"github.com/isantoshgyawali/git-go/utils"
@@ -54,7 +54,7 @@ func WriteTree(filePath string) (string, error) {
         if entry.Name() == ".git" { continue }
 
         if entry.IsDir() {
-            treeHash, err := WriteTree(path.Join(filePath, entry.Name())) 
+            treeHash, err := WriteTree(filepath.Join(filePath, entry.Name())) 
             if err != nil {
                 return "", err  
             }
@@ -62,19 +62,24 @@ func WriteTree(filePath string) (string, error) {
             treeEntries = append(treeEntries, fmt.Sprintf("040000 %s\000", entry.Name())...)
             treeEntries = append(treeEntries, []byte(treeHash)...)
         } else {
-            f, _ := os.Open(path.Join(filePath, entry.Name()))
-            defer f.Close()
-
+            f, _ := os.Open(filepath.Join(filePath, entry.Name()))
             b, _ := io.ReadAll(f)
-            fileHash, _ := utils.CompressObject("blob", b, nil)
+            defer f.Close()
+            fileHash, _ := utils.CompressObject("blob", b)
             
-            // Format: "040000 <name>\0<tree-hash>"
-            treeEntries = append(treeEntries, fmt.Sprintf("100644 %s\000", entry.Name())...)
+            // Format: "fileMode <name>\0<tree-hash>"
+            fileInfo, err := f.Stat()
+            if err != nil {
+              return "", err  
+            }
+            mode := utils.FileModeToGitMode(fileInfo.Mode())
+            treeEntries = append(treeEntries, fmt.Sprintf("%s %s\000", mode, entry.Name())...)
+            // fmt.Println(string(treeEntries))
             treeEntries = append(treeEntries, []byte(fileHash)...)
         }
     }
 
-    treeHash, err := utils.CompressObject("tree", treeEntries, nil)
+    treeHash, err := utils.CompressObject("tree", treeEntries)
     if err != nil {
         return "", err  
     }

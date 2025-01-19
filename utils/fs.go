@@ -6,31 +6,6 @@ import (
 	"path/filepath"
 )
 
-func FileDetails(file string) (*TreeNode, error) {
-    info, err := os.Stat(file)
-    if err != nil {
-        return nil, fmt.Errorf("File not found: %v", err) 
-    }
-
-    content, _ := os.ReadFile(file)
-    mode := FileModeToGitMode(info.Mode())
-    name := fmt.Sprintf("%s", info.Name())
-    hash, err := CompressObject("blob", content, nil)
-    if err != nil {
-        return nil, err 
-    }
-    
-    return &TreeNode{
-        Mode: mode, 
-        Type: "blob",
-        Name: name,
-        Hash: hash,
-        Path: file,
-        IsDir: false,
-        Children: nil,
-    }, nil 
-}
-
 func FindGitRoot() (gitDir string, rootPath string, err error) {
     rootPath, err = os.Getwd() // returns Current Working directory
     if err != nil {
@@ -48,7 +23,7 @@ func FindGitRoot() (gitDir string, rootPath string, err error) {
         }
         rootPath = parentDir
     }
-    return "", "", fmt.Errorf(".git directory not found.")
+    return "", "", fmt.Errorf("Error finding git root. Have you initialized the git project?")
 }
 
 func ModeToType(mode string) string {
@@ -67,9 +42,13 @@ func ModeToType(mode string) string {
 func FileModeToGitMode(mode os.FileMode) string {
     switch {
     case mode.IsDir():
-        return "040000"
+      return "040000"
     case mode.IsRegular():
-        return "100644"
-    }
+      if mode&0111 != 0 { return "100755" } // executable file 
+      return "100644" // non-executable regular file
+    case mode&os.ModeSymlink != 0:
+      return "120000" // symbolic links
+    // there are other fileTypes too : add more as required : [socket, device file... ]
+  }
     return ""
 }
