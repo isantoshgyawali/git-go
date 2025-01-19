@@ -58,15 +58,17 @@ func WriteTree(filePath string) (string, error) {
             if err != nil {
                 return "", err  
             }
+            fmt.Println(entry.Name(), ":", treeHash)
             // Format: "040000 <name>\0<tree-hash>"
             treeEntries = append(treeEntries, fmt.Sprintf("040000 %s\000", entry.Name())...)
             treeEntries = append(treeEntries, []byte(treeHash)...)
+            fmt.Println(string(treeEntries))
         } else {
             f, _ := os.Open(filepath.Join(filePath, entry.Name()))
             b, _ := io.ReadAll(f)
             defer f.Close()
+
             fileHash, _ := utils.CompressObject("blob", b)
-            
             // Format: "fileMode <name>\0<tree-hash>"
             fileInfo, err := f.Stat()
             if err != nil {
@@ -74,7 +76,6 @@ func WriteTree(filePath string) (string, error) {
             }
             mode := utils.FileModeToGitMode(fileInfo.Mode())
             treeEntries = append(treeEntries, fmt.Sprintf("%s %s\000", mode, entry.Name())...)
-            // fmt.Println(string(treeEntries))
             treeEntries = append(treeEntries, []byte(fileHash)...)
         }
     }

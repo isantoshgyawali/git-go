@@ -1,5 +1,10 @@
 package utils
 
+type Author struct {
+  Name string
+  Email string
+}
+
 type Object struct {
     Type string
     Content interface{}

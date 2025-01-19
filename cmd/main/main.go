@@ -164,6 +164,17 @@ func main() {
             fmt.Fprintf(os.Stderr, "Error writing tree.\n%v", err) 
         }
         fmt.Println(treeHash)
+    
+    case "commit-tree":
+        author := &utils.Author{
+          Name: "Santosh Gyawali",
+          Email: "random@example.com",
+        }
+        commitHash, err := args.CommitTree("", author)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, err.Error()) 
+        }
+        fmt.Printf(commitHash)
         
     default:
         fmt.Fprintf(os.Stderr, "Unknown command %s\n", command)
